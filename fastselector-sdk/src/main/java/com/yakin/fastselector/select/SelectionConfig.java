@@ -1,4 +1,6 @@
-package com.yakin.fastselector;
+package com.yakin.fastselector.select;
+
+import com.yakin.fastselector.ChooseType;
 
 public class SelectionConfig {
 

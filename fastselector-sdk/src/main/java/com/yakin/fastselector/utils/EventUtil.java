@@ -6,7 +6,7 @@ public class EventUtil {
 
     public static boolean isFastDoubleClick() {
         long time = System.currentTimeMillis();
-        if (time - lastClickTime < 800) {
+        if (time - lastClickTime < 500) {
             return true;
         }
         lastClickTime = time;

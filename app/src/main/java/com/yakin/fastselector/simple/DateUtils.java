@@ -42,7 +42,6 @@ public class DateUtils {
         try {
             return msFormat.format(duration);
         } catch (Exception e) {
-            e.printStackTrace();
             return "0:00";
         }
     }

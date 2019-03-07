@@ -11,6 +11,7 @@ import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 
+import com.yakin.fastselector.utils.MimeTypeUtil;
 import com.yakin.fastselector.utils.UriUtil;
 
 public class DBQuery {
@@ -36,8 +37,10 @@ public class DBQuery {
                 String type = split[0];
 
                 if ("primary".equalsIgnoreCase(type)) {
+                    String filePath = Environment.getExternalStorageDirectory() + "/" + split[1];
                     MediaModel media = new MediaModel();
-                    media.setPath(Environment.getExternalStorageDirectory() + "/" + split[1]);
+                    media.setPath(filePath);
+                    media.setMimeType(MimeTypeUtil.getMimeType(filePath));
                     return media;
                 }
             } else if (UriUtil.isDownloadsDocument(uri)) {  // DownloadsProvider
@@ -70,6 +73,7 @@ public class DBQuery {
         } else if ("file".equalsIgnoreCase(uri.getScheme())) { // File
             MediaModel media = new MediaModel();
             media.setPath(uri.getPath());
+            media.setMimeType(MimeTypeUtil.getMimeType(uri.getPath()));
             return media;
         }
         return null;

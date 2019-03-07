@@ -76,7 +76,7 @@ public class GridImageAdapter extends RecyclerView.Adapter<GridImageAdapter.View
                     }
                 }
             });
-            MediaModel media = list.get(position);
+            final MediaModel media = list.get(position);
 
             if(MimeTypeUtil.isVideo(media.getMimeType())) {
                 holder.duration.setVisibility(View.VISIBLE);
@@ -108,7 +108,7 @@ public class GridImageAdapter extends RecyclerView.Adapter<GridImageAdapter.View
                 holder.itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        listener.onBrowseClick(holder.getAdapterPosition(), view);
+                        listener.onBrowseClick(media, view);
                     }
                 });
             }
@@ -157,6 +157,6 @@ public class GridImageAdapter extends RecyclerView.Adapter<GridImageAdapter.View
     public interface onItemClickListener {
 
         void onSelectClick();
-        void onBrowseClick(int position, View view);
+        void onBrowseClick(MediaModel media, View view);
     }
 }

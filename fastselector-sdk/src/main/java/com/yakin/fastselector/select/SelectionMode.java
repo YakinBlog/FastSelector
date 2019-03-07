@@ -1,9 +1,10 @@
-package com.yakin.fastselector;
+package com.yakin.fastselector.select;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.support.v4.app.Fragment;
 
+import com.yakin.fastselector.ChooseType;
 import com.yakin.fastselector.utils.EventUtil;
 
 public class SelectionMode {
@@ -13,7 +14,7 @@ public class SelectionMode {
 
     private SelectionConfig config;
 
-    SelectionMode(Activity activity, Fragment fragment) {
+    public SelectionMode(Activity activity, Fragment fragment) {
         this.activity = activity;
         this.fragment = fragment;
         this.config = new SelectionConfig();
