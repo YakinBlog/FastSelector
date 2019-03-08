@@ -1,8 +1,6 @@
 package com.yakin.fastselector.simple;
 
 import android.Manifest;
-import android.content.Intent;
-import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
@@ -13,6 +11,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.yakin.fastselector.ChooseType;
+import com.yakin.fastselector.ISelectionHandler;
 import com.yakin.fastselector.Selector;
 import com.yakin.fastselector.model.MediaModel;
 import com.yakin.fastselector.utils.MimeTypeUtil;
@@ -20,7 +19,6 @@ import com.yakin.rtp.IRTPGrantHandler;
 import com.yakin.rtp.Permission;
 import com.yakin.rtp.RTPManager;
 
-import java.io.File;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements
@@ -33,11 +31,6 @@ public class MainActivity extends AppCompatActivity implements
     private ChooseType chooseType = ChooseType.ALL;
     private boolean isMultiSelectMode;
     private int maxSelectNum = 9;
-
-    public final static int REQUEST_CHOOSE = 101;
-    public final static int REQUEST_CROP = 102;
-
-    private Uri cropFileUri = Uri.fromFile(new File("/sdcard/abc.png"));
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,7 +51,15 @@ public class MainActivity extends AppCompatActivity implements
                         Selector.get(MainActivity.this)
                                 .openGallery(chooseType)
                                 .setMultiple(isMultiSelectMode)
-                                .forResult(REQUEST_CHOOSE);
+                                .forResult(new ISelectionHandler<List<MediaModel>>() {
+                                    @Override
+                                    public void onSelectionResult(int resultCode, List<MediaModel> list) {
+                                        if(resultCode == RESULT_OK) {
+                                            adapter.addMediaList(list);
+                                            adapter.notifyDataSetChanged();
+                                        }
+                                    }
+                                });
                     }
 
                     @Override
@@ -72,10 +73,14 @@ public class MainActivity extends AppCompatActivity implements
             public void onBrowseClick(MediaModel media, View view) {
                 if(MimeTypeUtil.isImage(media.getMimeType())) {
                     Selector.get(MainActivity.this)
-                            .openCrop()
-                            .setOriginalFilePath(media.getPath())
-                            .setTargetUri(cropFileUri)
-                            .forResult(REQUEST_CROP);
+                            .openCrop(media.getPath())
+                            .forResult(new ISelectionHandler<MediaModel>() {
+                                @Override
+                                public void onSelectionResult(int resultCode, MediaModel media) {
+                                    adapter.addMediaItem(media);
+                                    adapter.notifyDataSetChanged();
+                                }
+                            });
                 }
             }
         });
@@ -90,25 +95,6 @@ public class MainActivity extends AppCompatActivity implements
         findViewById(R.id.minus).setOnClickListener(this);
         findViewById(R.id.plus).setOnClickListener(this);
         findViewById(R.id.create).setOnClickListener(this);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == RESULT_OK) {
-            switch (requestCode) {
-                case REQUEST_CHOOSE:
-                    List<MediaModel> list = Selector.get(MainActivity.this).queryResultFromIntent(data);
-                    adapter.addMediaList(list);
-                    adapter.notifyDataSetChanged();
-                    break;
-                case REQUEST_CROP:
-                    MediaModel media = Selector.get(MainActivity.this).queryResultFromUri(cropFileUri);
-                    adapter.addMediaItem(media);
-                    adapter.notifyDataSetChanged();
-                    break;
-            }
-        }
     }
 
     @Override

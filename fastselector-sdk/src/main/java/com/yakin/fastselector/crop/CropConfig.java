@@ -7,20 +7,22 @@ import java.io.File;
 
 public class CropConfig {
 
-    String originalFilePath;
-    String targetFilePath;
+    public String originalFilePath;
+    public String targetFilePath;
 
-    File originalFile;
-    File targetFile;
+    public File originalFile;
+    public File targetFile;
 
-    Uri originalUri;
-    Uri targetUri;
+    public Uri originalUri;
+    public Uri targetUri;
 
-    int aspectX = 1; // 横向比例
-    int aspectY = 1; // 纵向比例
-    int outputWidth = 1000; // 输出的宽
-    int outputHeight = 1000; // 输出的高
-    boolean scale = true; // 是否支持比例缩放
+    public int aspectX = 1; // 横向比例
+    public int aspectY = 1; // 纵向比例
+    public int outputWidth = 1000; // 输出的宽
+    public int outputHeight = 1000; // 输出的高
+    public boolean scale = true; // 是否支持比例缩放
 
-    CompressFormat outputFormat = CompressFormat.PNG; // 输出格式
+    public CompressFormat outputFormat = CompressFormat.PNG; // 输出格式
+
+    CropConfig() { }
 }

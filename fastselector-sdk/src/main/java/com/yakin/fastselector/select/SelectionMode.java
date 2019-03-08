@@ -1,21 +1,19 @@
 package com.yakin.fastselector.select;
 
-import android.app.Activity;
-import android.content.Intent;
-import android.support.v4.app.Fragment;
-
 import com.yakin.fastselector.ChooseType;
+import com.yakin.fastselector.ISelectionHandler;
+import com.yakin.fastselector.SelectionFragment;
+import com.yakin.fastselector.model.MediaModel;
 import com.yakin.fastselector.utils.EventUtil;
+
+import java.util.List;
 
 public class SelectionMode {
 
-    private Activity activity;
-    private Fragment fragment;
-
+    private SelectionFragment fragment;
     private SelectionConfig config;
 
-    public SelectionMode(Activity activity, Fragment fragment) {
-        this.activity = activity;
+    public SelectionMode(SelectionFragment fragment) {
         this.fragment = fragment;
         this.config = new SelectionConfig();
     }
@@ -30,16 +28,9 @@ public class SelectionMode {
         return this;
     }
 
-    public void forResult(int requestCode) {
+    public void forResult(ISelectionHandler<List<MediaModel>> handler) {
         if (!EventUtil.isFastDoubleClick()) {
-            Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-            intent.setType(config.chooseType.getMimeType());
-            intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, config.multiple);
-            if (fragment != null) {
-                fragment.startActivityForResult(intent, requestCode);
-            } else {
-                activity.startActivityForResult(intent, requestCode);
-            }
+            fragment.startSelectionForResult(handler, config);
         }
     }
 }

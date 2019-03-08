@@ -1,64 +1,49 @@
 package com.yakin.fastselector;
 
 import android.app.Activity;
-import android.content.ClipData;
-import android.content.Intent;
 import android.net.Uri;
 import android.support.v4.app.Fragment;
 
 import com.yakin.fastselector.crop.CropMode;
-import com.yakin.fastselector.model.DBQuery;
-import com.yakin.fastselector.model.MediaModel;
 import com.yakin.fastselector.select.SelectionMode;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.io.File;
 
-public class Selector {
+public class Selector implements ISelector {
 
     public static boolean isPrintLog;
 
-    private Activity activity;
-    private Fragment fragment;
+    private ISelector selector;
 
-    private Selector(Activity activity, Fragment fragment) {
-        this.activity = activity;
-        this.fragment = fragment;
+    private Selector(Activity activity) {
+        this.selector = new SelectorImpl(activity);
     }
 
-    public static Selector get(Activity activity) {
-        return new Selector(activity, null);
+    public static ISelector get(Activity activity) {
+        return new Selector(activity);
     }
 
-    public static Selector get(Fragment fragment) {
-        return new Selector(fragment.getActivity(), null);
+    public static ISelector get(Fragment fragment) {
+        return new Selector(fragment.getActivity());
     }
 
+    @Override
     public SelectionMode openGallery(ChooseType chooseType) {
-        return new SelectionMode(activity, fragment)
-                .setChooseType(chooseType);
+        return selector.openGallery(chooseType);
     }
 
-    public CropMode openCrop() {
-        return new CropMode(activity, fragment);
+    @Override
+    public CropMode openCrop(String filePath) {
+        return selector.openCrop(filePath);
     }
 
-    public List<MediaModel> queryResultFromIntent(Intent intent) {
-        List<MediaModel> list = new ArrayList<>();
-        if(intent.getData() != null) {
-            list.add(queryResultFromUri(intent.getData()));
-        }
-        if(intent.getClipData() != null) {
-            ClipData clipData = intent.getClipData();
-            for (int i = 0; i < clipData.getItemCount(); i++) {
-                Uri uri = clipData.getItemAt(i).getUri();
-                list.add(queryResultFromUri(uri));
-            }
-        }
-        return list;
+    @Override
+    public CropMode openCrop(File file) {
+        return selector.openCrop(file);
     }
 
-    public MediaModel queryResultFromUri(Uri uri) {
-        return DBQuery.get(activity).query(uri);
+    @Override
+    public CropMode openCrop(Uri fileUri) {
+        return selector.openCrop(fileUri);
     }
 }
