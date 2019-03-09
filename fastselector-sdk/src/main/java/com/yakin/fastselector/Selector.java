@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.net.Uri;
 import android.support.v4.app.Fragment;
 
+import com.yakin.fastselector.create.CreationMode;
 import com.yakin.fastselector.crop.CropMode;
 import com.yakin.fastselector.select.SelectionMode;
 
@@ -45,5 +46,10 @@ public class Selector implements ISelector {
     @Override
     public CropMode openCrop(Uri fileUri) {
         return selector.openCrop(fileUri);
+    }
+
+    @Override
+    public CreationMode openCreate(ChooseType chooseType) {
+        return selector.openCreate(chooseType);
     }
 }

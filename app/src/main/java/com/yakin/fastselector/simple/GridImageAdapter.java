@@ -23,6 +23,7 @@ public class GridImageAdapter extends RecyclerView.Adapter<GridImageAdapter.View
 
     public static final int TYPE_SELECT = 1;
     public static final int TYPE_BROWSER = 2;
+    public static final int TYPE_CREATE = 3;
 
     private LayoutInflater inflater;
     private List<MediaModel> list;
@@ -51,8 +52,22 @@ public class GridImageAdapter extends RecyclerView.Adapter<GridImageAdapter.View
     }
 
     @Override
-    public void onBindViewHolder(final ViewHolder holder, int position) {
-        if (getItemViewType(position) == TYPE_SELECT) {
+    public void onBindViewHolder(final ViewHolder holder, final int position) {
+        final int dataIndex = position - 1;
+        if (getItemViewType(position) == TYPE_CREATE) {
+            holder.image.setBackgroundResource(R.color.placeholder);
+            holder.image.setImageResource(R.drawable.ic_camera);
+            holder.image.setScaleType(ImageView.ScaleType.CENTER);
+            if(listener != null) {
+                holder.image.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        listener.onCreateClick();
+                    }
+                });
+            }
+            holder.delete.setVisibility(View.INVISIBLE);
+        } else if (getItemViewType(position) == TYPE_SELECT) {
             holder.image.setImageResource(R.drawable.ic_add);
             if(listener != null) {
                 holder.image.setOnClickListener(new View.OnClickListener() {
@@ -68,32 +83,44 @@ public class GridImageAdapter extends RecyclerView.Adapter<GridImageAdapter.View
             holder.delete.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    int index = holder.getAdapterPosition();
-                    if (index != RecyclerView.NO_POSITION) {
-                        list.remove(index);
-                        notifyItemRemoved(index);
-                        notifyItemRangeChanged(index, list.size());
+                    if (dataIndex != RecyclerView.NO_POSITION) {
+                        list.remove(dataIndex);
+                        notifyItemRemoved(position);
+                        notifyItemRangeChanged(position, getItemCount());
                     }
                 }
             });
-            final MediaModel media = list.get(position);
-
+            final MediaModel media = list.get(dataIndex);
+            holder.panel.setVisibility(View.VISIBLE);
             if(MimeTypeUtil.isVideo(media.getMimeType())) {
-                holder.duration.setVisibility(View.VISIBLE);
-                holder.duration.setText(DateUtils.timeParse(media.getDuration()));
+                holder.panel.setText(DateUtils.timeParse(media.getDuration()));
                 Drawable drawable = ContextCompat.getDrawable(holder.itemView.getContext(), R.drawable.video_icon);
                 drawable.setBounds(0, 0, drawable.getMinimumWidth(), drawable.getMinimumHeight());
-                holder.duration.setCompoundDrawables(drawable, null, null, null);
+                holder.panel.setCompoundDrawables(drawable, null, null, null);
             } else if (MimeTypeUtil.isAudio(media.getMimeType())) {
-                holder.duration.setVisibility(View.VISIBLE);
-                holder.duration.setText(DateUtils.timeParse(media.getDuration()));
-                Drawable drawable = ContextCompat.getDrawable(holder.itemView.getContext(), R.drawable.picture_audio);
+                holder.panel.setText(DateUtils.timeParse(media.getDuration()));
+                Drawable drawable = ContextCompat.getDrawable(holder.itemView.getContext(), R.drawable.audio_icon);
                 drawable.setBounds(0, 0, drawable.getMinimumWidth(), drawable.getMinimumHeight());
-                holder.duration.setCompoundDrawables(drawable, null, null, null);
+                holder.panel.setCompoundDrawables(drawable, null, null, null);
+            } else if (MimeTypeUtil.isImage(media.getMimeType())){
+                holder.panel.setText("裁剪");
+                Drawable drawable = ContextCompat.getDrawable(holder.itemView.getContext(), R.drawable.edit_icon);
+                drawable.setBounds(0, 0, drawable.getMinimumWidth(), drawable.getMinimumHeight());
+                holder.panel.setCompoundDrawables(drawable, null, null, null);
+                if(listener != null) {
+                    holder.panel.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            listener.onCropClick(media, holder.itemView);
+                        }
+                    });
+                }
             }
 
             if (MimeTypeUtil.isAudio(media.getMimeType())) {
-                holder.image.setImageResource(R.drawable.audio_placeholder);
+                holder.image.setBackgroundResource(R.color.placeholder);
+                holder.image.setImageResource(R.drawable.ic_audio);
+                holder.image.setScaleType(ImageView.ScaleType.CENTER);
             } else {
                 RequestOptions options = new RequestOptions()
                         .centerCrop()
@@ -108,7 +135,7 @@ public class GridImageAdapter extends RecyclerView.Adapter<GridImageAdapter.View
                 holder.itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        listener.onBrowseClick(media, view);
+                        listener.onBrowseClick(media, holder.itemView);
                     }
                 });
             }
@@ -117,17 +144,23 @@ public class GridImageAdapter extends RecyclerView.Adapter<GridImageAdapter.View
 
     @Override
     public int getItemCount() {
-        return list.size() + 1;
+        return list.size() + 2;
     }
 
-    private boolean isShowSelectItem(int position) {
-        int size = list.size() == 0 ? 0 : list.size();
+    private boolean isSelectItem(int position) {
+        int size = list.size() == 0 ? 1 : list.size() + 1;
         return position == size;
+    }
+
+    private boolean isCreateItem(int position) {
+        return position == 0;
     }
 
     @Override
     public int getItemViewType(int position) {
-        if (isShowSelectItem(position)) {
+        if (isCreateItem(position)) {
+            return TYPE_CREATE;
+        } else if (isSelectItem(position)) {
             return TYPE_SELECT;
         } else {
             return TYPE_BROWSER;
@@ -138,13 +171,13 @@ public class GridImageAdapter extends RecyclerView.Adapter<GridImageAdapter.View
 
         ImageView image;
         ImageView delete;
-        TextView duration;
+        TextView panel;
 
         public ViewHolder(View view) {
             super(view);
             image = view.findViewById(R.id.image);
             delete = view.findViewById(R.id.delete);
-            duration = view.findViewById(R.id.duration);
+            panel = view.findViewById(R.id.panel);
         }
     }
 
@@ -157,6 +190,8 @@ public class GridImageAdapter extends RecyclerView.Adapter<GridImageAdapter.View
     public interface onItemClickListener {
 
         void onSelectClick();
+        void onCreateClick();
+        void onCropClick(MediaModel media, View view);
         void onBrowseClick(MediaModel media, View view);
     }
 }

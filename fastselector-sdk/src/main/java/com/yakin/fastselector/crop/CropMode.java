@@ -27,8 +27,8 @@ public class CropMode {
         return this;
     }
 
-    public CropMode setTargetFilePath(String targetFilePath) {
-        config.targetFilePath = targetFilePath;
+    public CropMode setSaveDirectory(String saveDirectory) {
+        config.saveDirectory = saveDirectory;
         return this;
     }
 
@@ -37,18 +37,8 @@ public class CropMode {
         return this;
     }
 
-    public CropMode setTargetFile(File targetFile) {
-        config.targetFile = targetFile;
-        return this;
-    }
-
     public CropMode setOriginalUri(Uri originalUri) {
         config.originalUri = originalUri;
-        return this;
-    }
-
-    public CropMode setTargetUri(Uri targetUri) {
-        config.targetUri = targetUri;
         return this;
     }
 

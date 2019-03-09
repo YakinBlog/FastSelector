@@ -8,13 +8,10 @@ import java.io.File;
 public class CropConfig {
 
     public String originalFilePath;
-    public String targetFilePath;
-
     public File originalFile;
-    public File targetFile;
-
     public Uri originalUri;
-    public Uri targetUri;
+
+    public String saveDirectory;
 
     public int aspectX = 1; // 横向比例
     public int aspectY = 1; // 纵向比例

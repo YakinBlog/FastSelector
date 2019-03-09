@@ -41,6 +41,7 @@ public class DBQuery {
                     MediaModel media = new MediaModel();
                     media.setPath(filePath);
                     media.setMimeType(MimeTypeUtil.getMimeType(filePath));
+                    media.setDuration(getDuration(media.getPath()));
                     return media;
                 }
             } else if (UriUtil.isDownloadsDocument(uri)) {  // DownloadsProvider
@@ -74,6 +75,7 @@ public class DBQuery {
             MediaModel media = new MediaModel();
             media.setPath(uri.getPath());
             media.setMimeType(MimeTypeUtil.getMimeType(uri.getPath()));
+            media.setDuration(getDuration(media.getPath()));
             return media;
         }
         return null;

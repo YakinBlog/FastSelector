@@ -4,8 +4,7 @@
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
 
-    <color name="placeholder">#f6f6f6</color>
+    <color name="placeholder">#999999</color>
     <color name="textcolor">#ffffff</color>
-    <color name="audio_placeholder">#999999</color>
     <color name="max_select_num">#9b9b9b</color>
 </resources>

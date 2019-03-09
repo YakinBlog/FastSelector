@@ -70,18 +70,60 @@ public class MainActivity extends AppCompatActivity implements
             }
 
             @Override
+            public void onCreateClick() {
+                RTPManager.get(MainActivity.this).requestPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, new IRTPGrantHandler() {
+                    @Override
+                    public void onPermissionGranted() {
+                        Selector.get(MainActivity.this)
+                                .openCreate(chooseType)
+                                .forResult(new ISelectionHandler<MediaModel>() {
+                                    @Override
+                                    public void onSelectionResult(int resultCode, MediaModel media) {
+                                        if(resultCode == RESULT_OK) {
+                                            adapter.addMediaItem(media);
+                                            adapter.notifyDataSetChanged();
+                                        }
+                                    }
+                                });
+                    }
+
+                    @Override
+                    public void onPermissionDenied(Permission[] permissions) {
+                        Toast.makeText(MainActivity.this, "无权进行此操作", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+
+            @Override
+            public void onCropClick(final MediaModel media, View view) {
+                RTPManager.get(MainActivity.this).requestPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, new IRTPGrantHandler() {
+                    @Override
+                    public void onPermissionGranted() {
+                        if(MimeTypeUtil.isImage(media.getMimeType())) {
+                            Selector.get(MainActivity.this)
+                                    .openCrop(media.getPath())
+                                    .forResult(new ISelectionHandler<MediaModel>() {
+                                        @Override
+                                        public void onSelectionResult(int resultCode, MediaModel media) {
+                                            if(resultCode == RESULT_OK) {
+                                                adapter.addMediaItem(media);
+                                                adapter.notifyDataSetChanged();
+                                            }
+                                        }
+                                    });
+                        }
+                    }
+
+                    @Override
+                    public void onPermissionDenied(Permission[] permissions) {
+                        Toast.makeText(MainActivity.this, "无权进行此操作", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+
+            @Override
             public void onBrowseClick(MediaModel media, View view) {
-                if(MimeTypeUtil.isImage(media.getMimeType())) {
-                    Selector.get(MainActivity.this)
-                            .openCrop(media.getPath())
-                            .forResult(new ISelectionHandler<MediaModel>() {
-                                @Override
-                                public void onSelectionResult(int resultCode, MediaModel media) {
-                                    adapter.addMediaItem(media);
-                                    adapter.notifyDataSetChanged();
-                                }
-                            });
-                }
+
             }
         });
 
@@ -94,7 +136,6 @@ public class MainActivity extends AppCompatActivity implements
         maxSelectNumView = findViewById(R.id.select_num);
         findViewById(R.id.minus).setOnClickListener(this);
         findViewById(R.id.plus).setOnClickListener(this);
-        findViewById(R.id.create).setOnClickListener(this);
     }
 
     @Override
@@ -133,12 +174,6 @@ public class MainActivity extends AppCompatActivity implements
             case R.id.plus:
                 maxSelectNum ++;
                 maxSelectNumView.setText(String.valueOf(maxSelectNum));
-                break;
-            case R.id.create:
-//                Selector.get(MainActivity.this)
-//                        .openGallery(chooseType)
-//                        .setMultiple(isMultiSelectMode)
-//                        .forResult(REQUEST_CHOOSE);
                 break;
         }
     }
