@@ -26,3 +26,17 @@ dependencies {
 
     implementation "com.android.support:appcompat-v7:${supportLibVersion}"
 }
+
+ext {
+    groupId = 'com.yakin.support'
+    artifactId = 'fastselector'
+    versionName = '0.0.1'
+    describe = 'Multimedia File Selector and Browser'
+
+    licenses = [ 'Apache-2.0' ]
+    websiteUrl = 'http://yakinblog.com'
+    vcsUrl = 'https://github.com/YakinBlog/FastSelector-android.git'
+    labels = ['android', 'gallery', 'camera', 'video']
+}
+apply from: 'https://raw.githubusercontent.com/YakinBlog/buildscript/master/publish_bintray.gradle'
+
