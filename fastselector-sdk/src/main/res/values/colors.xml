@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="fast_white">#FFFFFF</color>
+    <color name="fast_white_seleted">#DBDBDB</color>
+
+    <color name="fast_popup_background">#EEEEEE</color>
+    <color name="fast_popup_shade">#70000000</color>
+    <color name="fast_popup_textcolor">#53575E</color>
+</resources>

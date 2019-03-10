@@ -4,12 +4,12 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.content.Intent;
 import android.net.Uri;
-import android.provider.MediaStore;
 
 import com.yakin.fastselector.create.CreationConfig;
 import com.yakin.fastselector.crop.CropConfig;
 import com.yakin.fastselector.model.MediaModel;
 import com.yakin.fastselector.select.SelectionConfig;
+import com.yakin.fastselector.widget.ChoosePopupWindow;
 
 import java.util.List;
 
@@ -26,6 +26,8 @@ public class SelectionFragment extends Fragment {
 
     private SelectionInternalOperation operation;
 
+    private ChoosePopupWindow popupWindow;
+
     public SelectionFragment() {
         operation = new SelectionInternalOperation(this);
     }
@@ -40,29 +42,35 @@ public class SelectionFragment extends Fragment {
         saveFileUri = operation.startCrop(REQUEST_CROP, config);
     }
 
-    public void startCreationForResult(ISelectionHandler<MediaModel> handler, CreationConfig config) {
+    public void startCreationForResult(final ISelectionHandler<MediaModel> handler, final CreationConfig config) {
         this.handler = handler;
-        Intent intent = new Intent();
         if(config.chooseType == ChooseType.IMAGE) {
-            intent.setAction(MediaStore.ACTION_IMAGE_CAPTURE);
+            saveFileUri = operation.startTakeImage(REQUEST_TAKE_IMAGE, config, handler);
         } else if(config.chooseType == ChooseType.VIDEO) {
-            intent.setAction(MediaStore.ACTION_VIDEO_CAPTURE);
+            saveFileUri = operation.startTakeVideo(REQUEST_TAKE_VIDEO, config, handler);
         } else if(config.chooseType == ChooseType.AUDIO) {
-            intent.setAction(MediaStore.Audio.Media.RECORD_SOUND_ACTION);
-        }
-        // 检测对应程序是否存在
-        if(intent.resolveActivity(getActivity().getPackageManager()) == null) {
-            if(handler != null) {
-                handler.onSelectionResult(Activity.RESULT_CANCELED, null);
+            operation.startTakeAudio(REQUEST_TAKE_AUDIO, config, handler);
+        } else {
+            if(popupWindow == null) {
+                popupWindow = new ChoosePopupWindow(getActivity());
             }
-            return;
-        }
-        if(config.chooseType == ChooseType.IMAGE) {
-            saveFileUri = operation.startTakeImage(REQUEST_TAKE_IMAGE, config);
-        } else if(config.chooseType == ChooseType.VIDEO) {
-            saveFileUri = operation.startTakeVideo(REQUEST_TAKE_VIDEO, config);
-        } else if(config.chooseType == ChooseType.AUDIO) {
-            operation.startTakeAudio(REQUEST_TAKE_AUDIO, config);
+            popupWindow.setOnChooseItemClickListener(new ChoosePopupWindow.OnChooseItemClickListener() {
+                @Override
+                public void onImageClick() {
+                    saveFileUri = operation.startTakeImage(REQUEST_TAKE_IMAGE, config, handler);
+                }
+
+                @Override
+                public void onVideoClick() {
+                    saveFileUri = operation.startTakeVideo(REQUEST_TAKE_VIDEO, config, handler);
+                }
+
+                @Override
+                public void onAudioClick() {
+                    operation.startTakeAudio(REQUEST_TAKE_AUDIO, config, handler);
+                }
+            });
+            popupWindow.showAsDropDown(getView());
         }
     }
 

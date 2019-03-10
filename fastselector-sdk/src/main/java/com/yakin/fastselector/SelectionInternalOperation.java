@@ -84,7 +84,7 @@ class SelectionInternalOperation {
         return Uri.fromFile(file);
     }
 
-    public Uri startTakeImage(int requestCode, CreationConfig config) {
+    public Uri startTakeImage(int requestCode, CreationConfig config, ISelectionHandler handler) {
         if(config.saveDirectory == null) {
             config.saveDirectory = rootDir;
         }
@@ -104,11 +104,13 @@ class SelectionInternalOperation {
 
             intent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
             fragment.startActivityForResult(intent, requestCode);
+        } else if(handler != null) {
+            handler.onSelectionResult(Activity.RESULT_CANCELED, null);
         }
         return Uri.fromFile(file);
     }
 
-    public Uri startTakeVideo(int requestCode, CreationConfig config) {
+    public Uri startTakeVideo(int requestCode, CreationConfig config, ISelectionHandler handler) {
         if(config.saveDirectory == null) {
             config.saveDirectory = rootDir;
         }
@@ -128,15 +130,19 @@ class SelectionInternalOperation {
             }
             intent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, config.videoHighQuality ? 1 : 0);
             fragment.startActivityForResult(intent, requestCode);
+        } else if(handler != null) {
+            handler.onSelectionResult(Activity.RESULT_CANCELED, null);
         }
         return Uri.fromFile(file);
     }
 
-    public void startTakeAudio(int requestCode, CreationConfig config) {
+    public void startTakeAudio(int requestCode, CreationConfig config, ISelectionHandler handler) {
         Intent intent = new Intent(MediaStore.Audio.Media.RECORD_SOUND_ACTION);
         Activity activity = fragment.getActivity();
         if (intent.resolveActivity(activity.getPackageManager()) != null) {
             fragment.startActivityForResult(intent, requestCode);
+        } else if(handler != null) {
+            handler.onSelectionResult(Activity.RESULT_CANCELED, null);
         }
     }
 

@@ -76,6 +76,7 @@ public class MainActivity extends AppCompatActivity implements
                     public void onPermissionGranted() {
                         Selector.get(MainActivity.this)
                                 .openCreate(chooseType)
+                                .setVideoMaxSecond(10)
                                 .forResult(new ISelectionHandler<MediaModel>() {
                                     @Override
                                     public void onSelectionResult(int resultCode, MediaModel media) {
