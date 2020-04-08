@@ -67,6 +67,8 @@ class SelectionInternalOperation {
         intent.putExtra("outputX", config.outputWidth);
         intent.putExtra("outputY", config.outputHeight);
         intent.putExtra("scale", config.scale);
+        // 去除部分手机裁剪的黑边
+        intent.putExtra("scaleUpIfNeeded", true);
         intent.putExtra(MediaStore.EXTRA_OUTPUT, saveFileUri);
         intent.putExtra("outputFormat", config.outputFormat);
         intent.putExtra("noFaceDetection", true);
